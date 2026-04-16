@@ -12,18 +12,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Incomplete parameters' }, { status: 400 });
     }
 
-    // Safely package the phone number into the parameters string
-    // This prevents database errors without needing to alter your SQL schema
-    const packagedParameters = `[DIRECT LINE / WHATSAPP: ${phone || 'Not Provided'}]\n\n${parameters}`;
-
     // 1. Insert payload into Supabase Databanks
+    // Notice how these perfectly match your exact SQL schema columns now
     const { error: dbError } = await supabase.from('inquiries').insert([{ 
       client_identity: identity, 
-      comm_link: email, 
-      project_parameters: packagedParameters 
+      email: email, 
+      phone: phone || null,
+      project_parameters: parameters 
     }]);
 
-    if (dbError) throw new Error('Database insertion failed.');
+    // Better error handling so you aren't flying blind
+    if (dbError) {
+      console.error("Supabase Error Details:", dbError);
+      throw new Error(dbError.message);
+    }
 
     // 2. Initialize Secure Transporter
     const transporter = nodemailer.createTransport({
@@ -44,7 +46,7 @@ export async function POST(request: Request) {
           <h2 style="color: #D97757; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 24px; border-bottom: 1px solid #E5E7EB; padding-bottom: 12px;">System Alert: New Lead</h2>
           
           <p style="margin: 8px 0;"><strong>CLIENT IDENTITY:</strong> ${identity}</p>
-          <p style="margin: 8px 0;"><strong>COMM LINK:</strong> <a href="mailto:${email}" style="color: #2563EB;">${email}</a></p>
+          <p style="margin: 8px 0;"><strong>EMAIL:</strong> <a href="mailto:${email}" style="color: #2563EB;">${email}</a></p>
           <p style="margin: 8px 0;"><strong>DIRECT LINE:</strong> ${phone || 'Not Provided'}</p>
           
           <div style="margin-top: 30px; padding: 20px; border-left: 4px solid #D97757; background: #FFF; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border-radius: 0 8px 8px 0;">

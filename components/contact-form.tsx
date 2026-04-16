@@ -53,7 +53,7 @@ export function ContactForm() {
 
   return (
     <div className="w-full relative">
-      {/* Step 1: The Dynamic Choice (Only shows if they haven't picked a path yet) */}
+      {/* Step 1: The Dynamic Choice */}
       {!projectStage && status === "idle" && (
         <div className="p-8 md:p-12 bg-white/70 backdrop-blur-2xl border border-white flex flex-col gap-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
           <div className="text-center mb-4">
@@ -163,7 +163,7 @@ export function ContactForm() {
         </form>
       )}
 
-      {/* Success Message */}
+      {/* Success Message (Shows when it works) */}
       {status === "success" && (
         <div className="p-8 md:p-12 bg-white/70 backdrop-blur-2xl border border-white flex flex-col items-center justify-center gap-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] text-center animate-in zoom-in-95 duration-500">
           <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl mb-2">✓</div>
@@ -171,6 +171,18 @@ export function ContactForm() {
           <p className="text-gray-500 max-w-sm">Your parameters have been logged in the FRUOR databanks. Lead engineering will review and reply within 24 hours.</p>
           <button onClick={() => setStatus("idle")} className="mt-4 text-sm font-bold text-fruor-copper hover:text-gray-900 transition-colors">
             Submit another request
+          </button>
+        </div>
+      )}
+
+      {/* THE MISSING ERROR MESSAGE (Shows if API fails) */}
+      {status === "error" && (
+        <div className="p-8 md:p-12 bg-white/70 backdrop-blur-2xl border border-white flex flex-col items-center justify-center gap-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] text-center animate-in zoom-in-95 duration-500">
+          <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-3xl mb-2">✕</div>
+          <h4 className="text-2xl font-bold text-gray-900">Transmission Failed</h4>
+          <p className="text-gray-500 max-w-sm">There was an issue connecting to the servers. Please check your internet connection or use the WhatsApp link below.</p>
+          <button onClick={() => { setStatus("idle"); setProjectStage(null); }} className="mt-4 text-sm font-bold text-fruor-copper hover:text-gray-900 transition-colors">
+            Try Again
           </button>
         </div>
       )}
